@@ -288,8 +288,8 @@ class HMM(object):
         self.gammaDigamma(obs_seq);
         self.reestimate(obs_seq);
         logProb = self.logProbCal(obs_seq);
-        print "logProb: ";
-        print logProb;        
+#        print "logProb: ";
+#        print logProb;        
         iters = iters + 1;
         
         while iters<maxIters and (logProb - oldLogProb) >  math.pow(10,-6):
@@ -299,9 +299,9 @@ class HMM(object):
             self.reestimate(obs_seq);
             oldLogProb = logProb;
             logProb = self.logProbCal(obs_seq);
-            print logProb;            
+#            print logProb;            
             iters = iters + 1;
-        print logProb;
+#        print logProb;
         print iters
 #        print self.A
         

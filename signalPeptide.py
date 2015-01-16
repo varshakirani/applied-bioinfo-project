@@ -82,7 +82,7 @@ train_len = math.floor(0.75 * posLen);
 test_len = posLen - train_len;
 
 posLen = 5;
-train_len = 10;
+train_len = 3;
 negLen = 5;
 
 
@@ -99,21 +99,23 @@ for i in range(train_len):
 #print "testing:"
 maxProb = 0;
 whichClass = 0;  #0 for positive and 1 for negative
-#for test in range(train_len,posLen):
-#    for obj in posList:
-#        prob = obj.forwardAlgorithm(posSamples[test]);
-#        if prob > maxProb:
-#            maxProb = prob;
-#            whichClass = 0;
-#    for obj in negList:
-#        prob = obj.forwardAlgorithm(posSamples[test]);
-#        if prob > maxProb:
-#            maxProb = prob;
-#            whichClass = 1;
+for test in range(train_len,posLen):
+    for obj in posList:
+        prob = obj.forwardAlgorithm(posSamples[test]);
+        if prob > maxProb:
+            maxProb = prob;
+            whichClass = 0;
+    for obj in negList:
+        prob = obj.forwardAlgorithm(posSamples[test]);
+        if prob > maxProb:
+            maxProb = prob;
+            whichClass = 1;
             
-#    print "classified as:"
-#    if whichClass == 1:
-#        print "n0n-signal
+    print "classified as:"
+    if whichClass == 1:
+        print "non-signal";
+    else:
+        print "signal";
 
     
 #for samples in posSamples:
