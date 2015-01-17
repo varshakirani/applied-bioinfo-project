@@ -54,13 +54,17 @@ print posSamples[0];
             
 negSamples = [];
 negPath = "../../data/training_data/negative_examples";
-for root,dirs,files in os.walk(path):
+for root,dirs,files in os.walk(negPath):
     for names in files:
         if names.endswith((".faa")) and not names.startswith((".")):
             handle = open(str(root)+"/"+str(names),"rU");
             for record in SeqIO.parse(handle,"fasta"):
                 s = str(record.seq);
-                s = s[0:25];
+                annotationIndex = s.index('#');
+                maxLen = 25;
+                if annotationIndex < maxLen:
+                    maxLen = annotationIndex
+                s = s[0:maxLen];
                 obs_seq = convertToNumArr(s);
                 negSamples.append(obs_seq);
 #                for extensive negative samples
