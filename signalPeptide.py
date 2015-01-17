@@ -47,10 +47,10 @@ pi = [0.241896, 0.266086, 0.249153, 0.242864 ];
 
 (posSamples,negSamples)= ir.getSamples();
 
-posList = [];
+
 #sample = posSamples[0];
 
-negList = [];
+
 #posList.append(obj);
 #hmmObj = hmm.HMM();
 #(a,b,p) = hmmObj.getMatrices();
@@ -76,29 +76,38 @@ negList = [];
 
 shuffle(posSamples);
 shuffle(negSamples);
-posLen = len(posSamples);
-negLen = len(negSamples);
-train_len = math.floor(0.75 * posLen);
-test_len = posLen - train_len;
+per = 0.75
+def trainData(posSamples,negSamples,per):
+    negList = [];    
+    posList = [];    
+    posLen = len(posSamples);
+    negLen = len(negSamples);
+    train_len = math.floor(per * posLen);
+    posLen = 5;
+    train_len = 3;
+    negLen = 5;
+    
+    for i in range(train_len):
+        hmmObj = copy.deepcopy(hmm.HMM());
+        hmmObj.converge(posSamples[i],500);
+        posList.append(hmmObj);
+    
+    for i in range(train_len):
+        hmmObj = copy.deepcopy(hmm.HMM());
+        hmmObj.converge(negSamples[i],500);
+        negList.append(hmmObj);
+        
+    return(posList,negList);
 
-posLen = 5;
-train_len = 3;
-negLen = 5;
+#test_len = posLen - train_len;
+(posList,negList) = trainData(posSamples,negSamples,0.75);
 
 
-for i in range(train_len):
-    hmmObj = copy.deepcopy(hmm.HMM());
-    hmmObj.converge(posSamples[i],500);
-    posList.append(hmmObj);
-
-for i in range(train_len):
-    hmmObj = copy.deepcopy(hmm.HMM());
-    hmmObj.converge(negSamples[i],500);
-    negList.append(hmmObj);
     
 #print "testing:"
 maxProb = 0;
 whichClass = 0;  #0 for positive and 1 for negative
+
 for test in range(train_len,posLen):
     for obj in posList:
         prob = obj.forwardAlgorithm(posSamples[test]);
