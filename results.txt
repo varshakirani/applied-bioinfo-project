@@ -1,0 +1,11 @@
+MAX METHOD: classification rate 12 classified: 86 misClassified: 578
+AVERAGE METHOD: classification rate16 classified: 107 misClassified: 557
+With 5 states:
+MAX METHOD: classification rate 48 classified: 325 misClassified: 339
+AVERAGE METHOD: classification rate95 classified: 632 misClassified: 32
+
+With 5 states:
+MAX METHOD: classification rate 48 classified: 323 misClassified: 341
+AVERAGE METHOD: classification rate98 classified: 652 misClassified: 12
+MAX METHOD: classification rate 48 classified: 325 misClassified: 339
+AVERAGE METHOD: classification rate49 classified: 326 misClassified: 338
