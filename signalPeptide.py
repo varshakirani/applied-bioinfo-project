@@ -11,6 +11,7 @@ import copy;
 import numpy as np;
 from random import shuffle;
 import math;
+import proteomeTesting as pTest;
 #obj = hmm.HMM();
 
 A = [[0.4, 0.2, 0.2, 0.2],[0.2, 0.4, 0.2, 0.2],[ 0.2, 0.2, 0.4, 0.2],[ 0.2, 0.2, 0.2, 0.4]];
@@ -73,60 +74,204 @@ pi = [0.241896, 0.266086, 0.249153, 0.242864 ];
 #print b;
 #print "pi:";
 #print p
-
-shuffle(posSamples);
-shuffle(negSamples);
-per = 0.75
-def trainData(posSamples,negSamples,per):
-    negList = [];    
-    posList = [];    
-    posLen = len(posSamples);
-    negLen = len(negSamples);
-    train_len = math.floor(per * posLen);
-    posLen = 5;
+negList = [];    
+posList = [];  
+def trainData(trainPos,trainNeg):
+      
     train_len = 3;
-    negLen = 5;
-    
-    for i in range(train_len):
+    index = 0;
+    for posSample in trainPos:
         hmmObj = copy.deepcopy(hmm.HMM());
-        hmmObj.converge(posSamples[i],500);
+        hmmObj.converge(posSample,500);
         posList.append(hmmObj);
-    
-    for i in range(train_len):
+        index += 1;
+        print index;
+    for negSample in trainNeg:
         hmmObj = copy.deepcopy(hmm.HMM());
-        hmmObj.converge(negSamples[i],500);
+        hmmObj.converge(negSample,500);
         negList.append(hmmObj);
-        
+        index += 1;
+        print index;
+       
     return(posList,negList);
 
 #test_len = posLen - train_len;
-(posList,negList) = trainData(posSamples,negSamples,0.75);
 
 
     
 #print "testing:"
-maxProb = 0;
-whichClass = 0;  #0 for positive and 1 for negative
 
-for test in range(train_len,posLen):
-    for obj in posList:
-        prob = obj.forwardAlgorithm(posSamples[test]);
-        if prob > maxProb:
-            maxProb = prob;
-            whichClass = 0;
-    for obj in negList:
-        prob = obj.forwardAlgorithm(posSamples[test]);
-        if prob > maxProb:
-            maxProb = prob;
-            whichClass = 1;
+
+avgPosValues = [];
+avgNegValues = [];
+def testData(testPos,testNeg):
+    misClassified = 0;
+    classified = 0;    
+    maxProb = 0;
+    whichClassPos = 0;  #0 for positive and 1 for negative
+    whichClassNeg = 0;  #0 for positive and 1 for negative
+    avgPos = 0;
+    avgNeg = 0;
+    valPos = 0;
+    valNeg = 0;
+    avgClass = 0; #0 for positive and 1 for negative
+    avgClassified = 0;
+    avgMisClassified = 0;
+    for test in testPos:
+        for obj in posList:
+            prob = obj.forwardAlgorithm(test);
+            valPos += prob;            
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassPos = 0;
+        for obj in negList:
+            prob = obj.forwardAlgorithm(test);
+            valNeg += prob;
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassPos = 1;
+                
+        print "classified as:"
+        if whichClassPos == 1:
+            print "non-signal";
+            misClassified += 1;
+        else:
+            print "signal";
+            classified += 1;
             
-    print "classified as:"
-    if whichClass == 1:
-        print "non-signal";
-    else:
-        print "signal";
-
+        avgPos = valPos/len(posList);
+        avgNeg = valNeg/len(negList);
+        avgPosValues.append(avgPos);
+        avgNegValues.append(avgNeg);
+        print str(avgPos) + str(avgNeg);
+        if avgPos > avgNeg:
+            avgClass = 0;
+            avgClassified += 1;
+        else:
+            avgClass = 1;
+            avgMisClassified += 1;
     
+    valPos = 0;
+    valNeg = 0;   
+    for test in testNeg:
+        for obj in posList:
+            prob = obj.forwardAlgorithm(test);
+            valPos += prob;
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassNeg = 0;
+        for obj in negList:
+            prob = obj.forwardAlgorithm(test);
+            valNeg += prob;            
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassNeg = 1;
+                
+        print "classified as:";
+        if whichClassNeg == 1:
+            print "non-signal";
+            classified += 1;
+        else:
+            print "signal";
+            misClassified += 1;
+          
+        avgPos = valPos/len(posList);
+        avgNeg = valNeg/len(negList);
+        avgPosValues.append(avgPos);
+        avgNegValues.append(avgNeg);
+        
+        if avgPos < avgNeg:
+            avgClass = 1;
+            avgClassified += 1;
+        else:
+            avgClass = 0;
+            avgMisClassified += 1; 
+    f = open("results.txt","a");
+    classification_rate = classified * 100/(classified+misClassified);
+    f.write("MAX METHOD: classification rate "+str(classification_rate)+" classified: " +str(classified)+" misClassified: "+str(misClassified)+"\n");
+    avgClassRate = avgClassified * 100/(avgClassified+avgMisClassified);
+    f.write("AVERAGE METHOD: classification rate"+str(avgClassRate)+" classified: "+str(avgClassified)+" misClassified: "+str(avgMisClassified)+ "\n");    
+    f.close();
+
+shuffle(posSamples);
+shuffle(negSamples);
+per = 0.75
+
+totalSamples = len(posSamples) + len(negSamples);
+train_len = int(math.floor((per * totalSamples)/2));
+#train_len = 5;
+trainPos = posSamples[0:train_len];
+testPos = posSamples[train_len:len(posSamples)];
+
+trainNeg = negSamples[0:train_len];
+testNeg = negSamples[train_len:len(negSamples)];
+train_len = 3;    
+
+(posList,negList) = trainData(trainPos,trainNeg);
+testData(testPos,testNeg);
+
+
+def proteomTest(samples,name):
+    maxProb = 0;
+    whichClassPos = 0;  #0 for positive and 1 for negative
+    avgPos = 0;
+    avgNeg = 0;
+    valPos = 0;
+    valNeg = 0;
+    avgClass = 0; #0 for positive and 1 for negative
+    maxnPos = 0;
+    maxnNeg = 0;
+    avgnPos = 0;
+    avgnNeg = 0;
+    for sample in samples:
+        for obj in posList:
+            prob = obj.forwardAlgorithm(sample);
+            valPos += prob;            
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassPos = 0;
+        for obj in negList:
+            prob = obj.forwardAlgorithm(sample);
+            valNeg += prob;
+            if prob > maxProb:
+                maxProb = prob;
+                whichClassPos = 1;
+                
+        print "classified as:"
+        if whichClassPos == 1:
+            print "non-signal";
+            maxnNeg += 1;
+        else:
+            print "signal";
+            maxnPos += 1;
+            
+        avgPos = valPos/len(posList);
+        avgNeg = valNeg/len(negList);
+        print str(avgPos) + str(avgNeg);
+        if avgPos > avgNeg:
+            avgClass = 0;
+            avgnPos += 1;
+        else:
+            avgClass = 1;
+            avgnNeg += 1;
+    
+    
+    f = open("proteomeResults.txt","a");
+    f.write(name +'\n')
+    f.write("MAX METHOD: positve : "+str(maxnPos)+" ,negative: "+str(maxnNeg) +"\n");
+    f.write("Average METHOD: positve : "+str(avgnPos)+" ,negative: "+str(avgnNeg) +"\n");
+    f.close();
+        
+    
+(dros,homo,musc,sacc) = pTest.getSamples();
+proteomTest(dros,"drosophila");
+proteomTest(dros,"homo sapiens");
+proteomTest(dros,"mus musculus");
+proteomTest(dros,"saccharomyces");
+
+#conn = sqlite3.connect("project_db")
+#c = conn.cursor()
+
 #for samples in posSamples:
 #    hmmObj = copy.deepcopy(hmm.HMM());
 #    hmmObj.converge(samples,500);

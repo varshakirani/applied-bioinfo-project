@@ -9,3 +9,5 @@ MAX METHOD: classification rate 48 classified: 323 misClassified: 341
 AVERAGE METHOD: classification rate98 classified: 652 misClassified: 12
 MAX METHOD: classification rate 48 classified: 325 misClassified: 339
 AVERAGE METHOD: classification rate49 classified: 326 misClassified: 338
+MAX METHOD: classification rate 48 classified: 325 misClassified: 339
+AVERAGE METHOD: classification rate92 classified: 612 misClassified: 52

@@ -31,9 +31,6 @@ posSamples = [];
 for root,dirs,files in os.walk(path):
      for names in files:
          if names.endswith((".faa")) and not names.startswith((".")):
-#             print names;
-#             print root;
-#             print dirs;
              handle = open(str(root)+"/"+str(names),"rU");
              for record in SeqIO.parse(handle,"fasta"):   #reads FASTA file and record will have id and sequence
                  s = str(record.seq)

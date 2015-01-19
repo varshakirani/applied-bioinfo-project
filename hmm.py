@@ -12,7 +12,7 @@ class HMM(object):
 #    N = 5;          #number of states (-n,-c,-h regions)
 #    M = 21;         #number of observations(ACDEFGHIKLMNPQRSTVWY) 
                     #The above mentioned observations are mapped to integers from 1 to 20
-    N = 4;
+    N = 5;
     M = 21;
     A = np.zeros((N,N));
     B = np.zeros((N,M));  
@@ -301,9 +301,6 @@ class HMM(object):
             logProb = self.logProbCal(obs_seq);
 #            print logProb;            
             iters = iters + 1;
-#        print logProb;
-        print iters
-#        print self.A
         
                 
         
@@ -315,7 +312,7 @@ class HMM(object):
         noise[1]=0.2;
         noise[2]=0.3;
         noise[3]=0.15;
-#        noise[4]=0.45;
+        noise[4]=0.45;
 #        noise[5]=0.89;
         N = self.N;
         M = self.M;
